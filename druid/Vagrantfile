@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
+  # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/trusty64"
 
   # Disable automatic box update checking. If you disable this, then
@@ -22,7 +22,13 @@ Vagrant.configure("2") do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
   # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -48,41 +54,31 @@ Vagrant.configure("2") do |config|
     vb.gui = true
   
     # Customize the amount of memory on the VM:
-    vb.memory = "1524"
+    vb.memory = "4096"
   end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
 
-  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
-  # such as FTP and Heroku are also available. See the documentation at
-  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
-  # config.push.define "atlas" do |push|
-  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
-  # end
-
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   # config.vm.provision "shell", inline: <<-SHELL
-  #    apt-get update
-  #    apt-get -y upgrade
-  #    apt-get install -y build-essential
+  #   apt-get update
+
+  #   curl http://www.gtlib.gatech.edu/pub/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz -o zookeeper-3.4.6.tar.gz
+  #   tar -xzf zookeeper-3.4.6.tar.gz
+  #   cd zookeeper-3.4.6
+  #   cp conf/zoo_sample.cfg conf/zoo.cfg
+  #   cd ~
+  #   curl -O http://static.druid.io/artifacts/releases/druid-0.10.1-bin.tar.gz
+  #   tar -xzf druid-0.10.1-bin.tar.gz
+  #   cd druid-0.10.1
+  #   bin/init
   # SHELL
 
-  VAGRANT_JSON = JSON.parse(Pathname(__FILE__).dirname.join('nodes', 'vagrant.json').read)
-
-  config.vm.provision :chef_solo do |chef|
-    chef.cookbook_path = ["site-cookbooks", "cookbooks"]
-    chef.roles_path = "roles"
-    chef.data_bags_path = "data_bags"
-    chef.provisioning_path = "/tmp/vagrant-chef"
-
-    # You may also specify custom JSON attributes:
-    chef.run_list = VAGRANT_JSON.delete('run_list') if VAGRANT_JSON['run_list']
-
-    chef.json = VAGRANT_JSON
+  config.vm.provision "ansible" do |ansible|
+    ansible.verbose = "v"
+    ansible.playbook = "druid.yml"
   end
-
-
 end
