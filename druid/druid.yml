@@ -28,9 +28,10 @@
         dest: /
         remote_src: yes
     - file: path=/tmp/druid-0.10.1-bin.tar.gz state=absent
-
+    - name: delete log dir for running bin/init
+      file: path=/druid-0.10.1/log/ state=absent
     - name: run druid
-      command: rm -rf log && bin/init
+      command: bin/init
       args:
           chdir: /druid-0.10.1
 
