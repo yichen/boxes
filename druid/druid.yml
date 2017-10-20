@@ -1,49 +1,38 @@
-- hosts: all
-  become: yes
-  become_method: sudo
-  tasks:
-    - name: install oracale java 8
-      import_tasks: java8.yml
+---
 
-    - name: download zookeeper
-      get_url: 
-        url: http://www.gtlib.gatech.edu/pub/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz 
-        dest: /tmp/zookeeper-3.4.6.tar.gz
-    - name: unarchive zookeeper
-      unarchive: 
-        src: /tmp/zookeeper-3.4.6.tar.gz 
-        dest: /
-        remote_src: yes
-    - file: 
-        path: /tmp/zookeeper-3.4.6.tar.gz 
-        state: absent
+- name: download zookeeper
+  get_url: 
+    url: http://www.gtlib.gatech.edu/pub/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz 
+    dest: /tmp/zookeeper-3.4.6.tar.gz
 
-    - name: config zookeeper
-      command: cp /zookeeper-3.4.6/conf/zoo_sample.cfg /zookeeper-3.4.6/conf/zoo.cfg
+- name: unarchive zookeeper
+  unarchive: 
+    src: /tmp/zookeeper-3.4.6.tar.gz 
+    dest: /
+    remote_src: yes
+- file: 
+    path: /tmp/zookeeper-3.4.6.tar.gz 
+    state: absent
 
-    - name: download druid
-      get_url: url=http://static.druid.io/artifacts/releases/druid-0.10.1-bin.tar.gz dest=/tmp/druid-0.10.1-bin.tar.gz
-    - unarchive: 
-        src: /tmp/druid-0.10.1-bin.tar.gz 
-        dest: /
-        remote_src: yes
-    - file: path=/tmp/druid-0.10.1-bin.tar.gz state=absent
-    - name: delete log dir for running bin/init
-      file: path=/druid-0.10.1/log/ state=absent
-    - name: run druid
-      command: bin/init
-      args:
-          chdir: /druid-0.10.1
+- name: config zookeeper
+  command: cp /zookeeper-3.4.6/conf/zoo_sample.cfg /zookeeper-3.4.6/conf/zoo.cfg
 
-    - name: override the common.runtime.properties file.
-      command: cp /vagrant/common.runtime.properties /druid-0.10.1/conf-quickstart/druid/_common/common.runtime.properties
+- name: download druid
+  get_url: url=http://static.druid.io/artifacts/releases/druid-0.10.1-bin.tar.gz dest=/tmp/druid-0.10.1-bin.tar.gz
 
-    - name: install supervisor
-      apt: 
-        name: supervisor
-        state: present
-    - name: copy the supervisor config file
-      command: cp /vagrant/supervisor_druid.conf /etc/supervisor/conf.d/druid.conf
-    - name: reload supervisor configs
-      command: supervisorctl reread
-    - command: supervisorctl update
+- unarchive: 
+    src: /tmp/druid-0.10.1-bin.tar.gz 
+    dest: /
+    remote_src: yes
+- file: path=/tmp/druid-0.10.1-bin.tar.gz state=absent
+
+- name: delete log dir for running bin/init
+  file: path=/druid-0.10.1/log/ state=absent
+
+- name: run druid
+  command: bin/init
+  args:
+      chdir: /druid-0.10.1
+
+- name: override the common.runtime.properties file.
+  command: cp /vagrant/common.runtime.properties /druid-0.10.1/conf-quickstart/druid/_common/common.runtime.properties
