@@ -1,7 +1,6 @@
 - hosts: all
   become: yes
   become_method: sudo
-  compatibility_mode: "auto"
   tasks:
     - name: install oracale java 8
       import_tasks: java8.yml
