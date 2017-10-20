@@ -19,11 +19,21 @@ Vagrant.configure("2") do |config|
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
+  # Druid Overlord
   config.vm.network "forwarded_port", guest: 8090, host: 8090
+
+  # Druid coordinator
+  config.vm.network "forwarded_port", guest: 8081, host: 8081
+
+  # Druid Broker
+  config.vm.network "forwarded_port", guest: 8082, host: 8082
+
+  # Druid Historical
+  config.vm.network "forwarded_port", guest: 8083, host: 8083
+
+  # Druid Middle Manager
+  config.vm.network "forwarded_port", guest: 8091, host: 8091
+
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access

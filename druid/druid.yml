@@ -35,6 +35,9 @@
       args:
           chdir: /druid-0.10.1
 
+    - name: override the common.runtime.properties file.
+      command: cp /vagrant/common.runtime.properties /druid-0.10.1/conf-quickstart/druid/_common/common.runtime.properties
+
     - name: install supervisor
       apt: 
         name: supervisor
