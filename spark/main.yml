@@ -1,0 +1,30 @@
+- hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: install oracale java 8
+      import_tasks: java8.yml
+
+    - name: download spark 2.2.0 on Hadoop
+      get_url: url=https://d3kbcqa49mib13.cloudfront.net/spark-2.2.0-bin-hadoop2.7.tgz dest=/tmp/spark-2.2.0-bin-hadoop2.7.tgz
+
+    - name: unarchive spark source code
+      unarchive: src=/tmp/spark-2.2.0-bin-hadoop2.7.tgz dest=/tmp/ copy=no
+
+    - name: clean up /spark directory
+      file: path=/spark state=absent
+      
+    - name: move spark binaries to /spark directory
+      command: mv /tmp/spark-2.2.0-bin-hadoop2.7 /spark
+
+    - name: clean up spark-2.2.0.tgz
+      file: path=/tmp/spark-2.2.0-bin-hadoop2.7 state=absent
+
+    - name: create spark/logs path
+      file: path=/spark/logs state=directory mode=0777
+
+    - name: create spark/work directory
+      file: path=/spark/work state=directory mode=0777
+
+    - name: install supervisor
+      import_tasks: supervisor.yml

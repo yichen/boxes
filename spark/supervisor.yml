@@ -1,0 +1,11 @@
+---
+
+- name: install supervisor
+  apt: 
+    name: supervisor
+    state: present
+- name: copy the supervisor config file
+  command: cp /vagrant/supervisor_spark.conf /etc/supervisor/conf.d/spark.conf
+- name: reload supervisor configs
+  command: supervisorctl reread
+- command: supervisorctl update
